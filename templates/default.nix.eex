@@ -63,6 +63,7 @@ stdenv.mkDerivation {
   '';
 
   HOME = ".";
+  MIX_ENV = "prod";
 
   buildPhase = ''
     runHook preBuild
