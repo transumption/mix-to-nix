@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, elixir, glib, src }:
+{ src, stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, elixir, glib }:
 
 with stdenv.lib;
 
