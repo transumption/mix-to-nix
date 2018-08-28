@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, glib, elixir }:
+{ stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, elixir, glib, src ? ./. }:
 
 with stdenv.lib;
 
@@ -48,7 +48,7 @@ in
 
 stdenv.mkDerivation {
   name = "mix-project";
-  src = ./.;
+  inherit src;
 
   buildInputs = [ elixir ];
 
