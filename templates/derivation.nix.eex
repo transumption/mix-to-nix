@@ -52,10 +52,6 @@ stdenv.mkDerivation {
 
   buildInputs = [ elixir ];
 
-  patchPhase = ''
-    echo "defmodule Hex do; end" > lib/hex.ex
-  '';
-
   preConfigure = "mkdir deps";
   configurePhase = concatStrings (mapAttrsToList linkPackage closure);
 
