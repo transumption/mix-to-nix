@@ -34,8 +34,9 @@ let
     };
 
     buildCommand = ''
-      mkdir $out
-      ${gzseek}/bin/gzseek $src | tar -C $out -zxf -
+      mkdir $out && cd $out
+      ${gzseek}/bin/gzseek $src | tar -zxf -
+      echo ${pname},${version},${sha256},hexpm > .hex
     '';
   };
 
