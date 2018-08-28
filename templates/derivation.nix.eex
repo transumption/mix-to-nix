@@ -43,7 +43,7 @@ let
 <%= closure %>
   };
 
-  linkPackage = name: src: "ln -s ${src} deps/${name}";
+  linkDependency = name: src: "ln -s ${src} deps/${name}";
 in
 
 stdenv.mkDerivation {
@@ -52,14 +52,24 @@ stdenv.mkDerivation {
 
   buildInputs = [ elixir ];
 
-  preConfigure = "mkdir deps";
-  configurePhase = concatStrings (mapAttrsToList linkPackage closure);
+  configurePhase = ''
+    runHook preConfigure
+
+    mkdir deps
+    ${concatStrings (mapAttrsToList linkDependency closure)}
+
+    runHook postConfigure
+  '';
 
   HOME = ".";
 
   buildPhase = ''
+    runHook preBuild
+
     mix archive.install --force ${hex}
     mix compile
+
+    runHook postBuild
   '';
 
   installPhase = "mkdir -p $out && mv * $out";
