@@ -1,0 +1,4 @@
+_build
+/deps
+/mix2nix
+/result

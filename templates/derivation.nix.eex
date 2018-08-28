@@ -1,0 +1,70 @@
+{ stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, glib, elixir }:
+
+with stdenv.lib;
+
+let
+  gzseek = stdenv.mkDerivation {
+    name = "gzseek";
+
+    src = fetchzip {
+      url = "https://github.com/serokell/gzseek/archive/1e75f98b8cdd3be32088f76a6eb0ab288dfb5e2b.tar.gz";
+      sha256 = "132s82cx9n4rgcqv6ylm4qz0czjlv1wd5zlchi808jcrjvl42w9c";
+    };
+
+    nativeBuildInputs = [ meson ninja pkgconfig ];
+    buildInputs = [ glib ];
+  };
+
+  hex = fetchurl {
+    url = "https://repo.hex.pm/installs/1.6.0/hex-0.18.1.ez";
+    sha512 = "9c806664a3341930df4528be38b0da216a31994830c4437246555fe3027c047e073415bcb1b6557a28549e12b0c986142f5e3485825a66033f67302e87520119";
+  };
+
+  fetchHex = { pname, version, sha256 }: stdenv.mkDerivation {
+    name = "hex-${pname}-${version}";
+
+    src = fetchurl {
+      url = "https://repo.hex.pm/tarballs/${pname}-${version}.tar";
+      inherit sha256;
+
+      postFetch = ''
+        tar -xf $downloadedFile
+        cat VERSION metadata.config contents.tar.gz > $out
+      '';
+    };
+
+    buildCommand = ''
+      mkdir $out
+      ${gzseek}/bin/gzseek $src | tar -C $out -zxf -
+    '';
+  };
+
+  closure = {
+<%= closure %>
+  };
+
+  linkPackage = name: src: "ln -s ${src} deps/${name}";
+in
+
+stdenv.mkDerivation {
+  name = "mix-project";
+  src = ./.;
+
+  buildInputs = [ elixir ];
+
+  patchPhase = ''
+    echo "defmodule Hex do; end" > lib/hex.ex
+  '';
+
+  preConfigure = "mkdir deps";
+  configurePhase = concatStrings (mapAttrsToList linkPackage closure);
+
+  HOME = ".";
+
+  buildPhase = ''
+    mix archive.install --force ${hex}
+    mix compile
+  '';
+
+  installPhase = "mkdir -p $out && mv * $out";
+}
