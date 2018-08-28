@@ -72,5 +72,12 @@ stdenv.mkDerivation {
     runHook postBuild
   '';
 
-  installPhase = "mkdir -p $out && mv * $out";
+  installPhase = ''
+    runHook preInstall
+
+    mkdir $out
+    mv * $out
+
+    runHook postInstall
+  '';
 }
