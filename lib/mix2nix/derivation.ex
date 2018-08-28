@@ -3,7 +3,7 @@ alias Mix2Nix.Template
 defmodule Mix2Nix.Derivation do
   use Template
 
-  deftemplate :template, "derivation.nix.eex", [:closure]
+  deftemplate :template, "default.nix.eex", [:closure]
 
   deftemplate :fetch_git, "fetch_git.nix.eex", [:name, :url, :rev]
   deftemplate :fetch_hex, "fetch_hex.nix.eex", [:name, :version, :sha256]
