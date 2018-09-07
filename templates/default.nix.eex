@@ -57,7 +57,7 @@ stdenv.mkDerivation {
     runHook preConfigure
 
     mkdir deps
-    ${concatStrings (mapAttrsToList linkDependency closure)}
+    ${concatStringsSep "\n" (mapAttrsToList linkDependency closure)}
 
     runHook postConfigure
   '';
