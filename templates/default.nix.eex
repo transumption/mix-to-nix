@@ -7,8 +7,8 @@ let
     name = "gzseek";
 
     src = fetchzip {
-      url = "https://github.com/serokell/gzseek/archive/1e75f98b8cdd3be32088f76a6eb0ab288dfb5e2b.tar.gz";
-      sha256 = "132s82cx9n4rgcqv6ylm4qz0czjlv1wd5zlchi808jcrjvl42w9c";
+      url = "https://github.com/serokell/gzseek/archive/742ea67e84c8dfffcca3b239320cc9f321487d75.tar.gz";
+      sha256 = "0pi871r60kh5xjlkz8paxsasqqjbgdddk8g4hmp4cp32cbx69xlw";
     };
 
     nativeBuildInputs = [ meson ninja pkgconfig ];
