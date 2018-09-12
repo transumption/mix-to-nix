@@ -4,9 +4,6 @@ defmodule Mix2Nix.MixProject do
   def project do
     [
       app: :mix2nix,
-      deps: [
-        {:dialyxir, "~> 0.5", only: :dev, runtime: false}
-      ],
       escript: [main_module: Mix2Nix.CLI],
       version: "0.1.0"
     ]

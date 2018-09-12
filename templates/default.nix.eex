@@ -1,4 +1,4 @@
-{ src, stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, elixir, glib }:
+root: { stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, elixir, glib, rebar, rebar3 }:
 
 with stdenv.lib;
 
@@ -44,14 +44,14 @@ let
 <%= closure %>
   };
 
-  linkDependency = name: src: "ln -s ${src} deps/${name}";
+  linkDependency = name: src: "cp -rs --no-preserve=mode ${src} deps/${name}";
 in
 
 stdenv.mkDerivation {
   name = "mix-project";
-  inherit src;
+  src = root;
 
-  buildInputs = [ elixir ];
+  buildInputs = [ elixir rebar rebar3 ];
 
   configurePhase = ''
     runHook preConfigure
@@ -63,7 +63,10 @@ stdenv.mkDerivation {
   '';
 
   HOME = ".";
+
   MIX_ENV = "prod";
+  MIX_REBAR = "${rebar}/bin/rebar";
+  MIX_REBAR3 = "${rebar3}/bin/rebar3";
 
   buildPhase = ''
     runHook preBuild

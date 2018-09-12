@@ -2,5 +2,5 @@ with import <nixpkgs> {};
 
 stdenvNoCC.mkDerivation {
   name = "mix2nix";
-  buildInputs = [ elixir erlangR20 ];
+  buildInputs = [ elixir erlang ];
 }
