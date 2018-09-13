@@ -1,4 +1,4 @@
     <%= name %> = fetchGit {
-      url = <%= url %>;
+      url = "<%= url %>";
       rev = "<%= rev %>";
     };
