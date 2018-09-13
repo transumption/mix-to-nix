@@ -88,7 +88,7 @@ stdenv.mkDerivation {
     runHook preInstall
 
     mkdir $out
-    mv * $out
+    mv * .mix $out
 
     runHook postInstall
   '';
