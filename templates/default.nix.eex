@@ -72,7 +72,7 @@ stdenv.mkDerivation {
     runHook preBuild
 
     mix archive.install --force ${hex}
-    mix compile
+    mix compile --no-deps-check
 
     runHook postBuild
   '';
