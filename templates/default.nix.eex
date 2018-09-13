@@ -44,7 +44,13 @@ let
 <%= closure %>
   };
 
-  linkDependency = name: src: "cp -rs --no-preserve=mode ${src} deps/${name}";
+  # Deep link deps so mix can write build files in the dep dirs, then fool mix
+  # to think any git deps are checked out.
+  linkDependency = name: src: ''
+    cp -rs --no-preserve=mode ${src} deps/${name}
+    mkdir deps/${name}/.git
+    touch deps/${name}/.git/HEAD
+  '';
 in
 
 stdenv.mkDerivation {
@@ -72,6 +78,7 @@ stdenv.mkDerivation {
     runHook preBuild
 
     mix archive.install --force ${hex}
+    mix deps.compile --force
     mix compile --no-deps-check
 
     runHook postBuild
