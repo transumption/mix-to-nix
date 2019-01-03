@@ -1,4 +1,4 @@
-root: { stdenv, fetchurl, fetchzip, elixir, python3Packages, rebar, rebar3 }:
+root: { stdenv, fetchurl, fetchzip, elixir, glibcLocales, python3Packages, rebar, rebar3 }:
 
 with stdenv.lib;
 
@@ -68,6 +68,10 @@ stdenv.mkDerivation {
   '';
 
   HOME = ".";
+  LANG = "en_US.UTF-8";
+
+  LOCALE_ARCHIVE = stdenv.lib.optionalString stdenv.isLinux
+    "${glibcLocales}/lib/locale/locale-archive";
 
   MIX_ENV = "prod";
   MIX_REBAR = "${rebar}/bin/rebar";

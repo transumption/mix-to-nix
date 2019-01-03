@@ -1,5 +1,5 @@
 { stdenv, elixir, erlang, runCommand
-, fetchurl, fetchzip, python3Packages, rebar, rebar3 }: root:
+, fetchurl, fetchzip, glibcLocales, python3Packages, rebar, rebar3 }: { src }:
 
 let
   mix-to-nix = stdenv.mkDerivation {
@@ -17,6 +17,6 @@ let
   '';
 in
 
-(import (mixToNix root)) root {
-  inherit stdenv elixir fetchurl fetchzip python3Packages rebar rebar3;
+(import (mixToNix src)) src {
+  inherit stdenv elixir fetchurl fetchzip glibcLocales python3Packages rebar rebar3;
 }
