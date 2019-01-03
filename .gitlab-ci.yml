@@ -1,5 +1,8 @@
 image: nixos/nix
 
+before_script:
+  - nix-env -f pkgs.nix -iA git
+
 test:
   stage: test
   script: nix-build tests
