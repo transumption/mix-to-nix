@@ -1,5 +1,0 @@
-    <%= name %> = fetchHex {
-      pname = "<%= hex_name %>";
-      version = "<%= version %>";
-      sha256 = "<%= sha256 %>";
-    };
