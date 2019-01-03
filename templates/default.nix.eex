@@ -1,18 +1,10 @@
-root: { stdenv, fetchurl, fetchzip, meson, ninja, pkgconfig, elixir, glib, rebar, rebar3 }:
+root: { stdenv, fetchurl, fetchzip, elixir, python3Packages, rebar, rebar3 }:
 
 with stdenv.lib;
 
 let
-  gzseek = stdenv.mkDerivation {
-    name = "gzseek";
-
-    src = fetchzip {
-      url = "https://github.com/serokell/gzseek/archive/742ea67e84c8dfffcca3b239320cc9f321487d75.tar.gz";
-      sha256 = "0pi871r60kh5xjlkz8paxsasqqjbgdddk8g4hmp4cp32cbx69xlw";
-    };
-
-    nativeBuildInputs = [ meson ninja pkgconfig ];
-    buildInputs = [ glib ];
+  binwalk = python3Packages.binwalk.override {
+    pyqtgraph = null;
   };
 
   hex = fetchurl {
@@ -25,6 +17,7 @@ let
 
     src = fetchurl {
       url = "https://repo.hex.pm/tarballs/${pname}-${version}.tar";
+      name = "${pname}-${version}.mix";
       inherit sha256;
 
       postFetch = ''
@@ -33,10 +26,16 @@ let
       '';
     };
 
-    buildCommand = ''
-      mkdir $out && cd $out
-      ${gzseek}/bin/gzseek $src | tar -zxf -
-      echo ${pname},${version},${sha256},hexpm > .hex
+    nativeBuildInputs = [ binwalk ];
+
+    unpackPhase = ''
+      HOME=. binwalk --extract $src
+    '';
+
+    installPhase = ''
+      mkdir $out
+      echo ${pname},${version},${sha256},hexpm > $out/.hex
+      tar xf *.extracted/* -C $out
     '';
   };
 
