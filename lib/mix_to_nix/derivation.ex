@@ -1,6 +1,6 @@
-alias Mix2Nix.Template
+alias MixToNix.Template
 
-defmodule Mix2Nix.Derivation do
+defmodule MixToNix.Derivation do
   use Template
 
   deftemplate(:template, "default.nix.eex", [:closure])

@@ -1,6 +1,6 @@
-alias Mix2Nix.Derivation
+alias MixToNix.Derivation
 
-defmodule Mix2Nix.CLI do
+defmodule MixToNix.CLI do
   def main([path]) do
     {term, _} = Code.eval_file(path)
     IO.puts(Derivation.render(term))

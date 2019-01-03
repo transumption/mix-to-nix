@@ -1,4 +1,4 @@
-defmodule Mix2Nix.Template do
+defmodule MixToNix.Template do
   defmacro __using__([]) do
     quote do
       import unquote(__MODULE__)

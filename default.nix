@@ -1,19 +1,22 @@
-{ stdenv, elixir, erlang, runCommand }: root:
+{ stdenv, elixir, erlang, runCommand
+, fetchurl, fetchzip, python3Packages, rebar, rebar3 }: root:
 
 let
-  mix2nix = stdenv.mkDerivation {
-    name = "mix2nix";
-    src = ./.;
+  mix-to-nix = stdenv.mkDerivation {
+    name = "mix-to-nix";
+    src = stdenv.lib.cleanSource ./.;
 
     buildInputs = [ elixir erlang ];
     buildPhase = "mix escript.build";
 
-    installPhase = "install -Dt $out/bin mix2nix";
+    installPhase = "install -Dt $out/bin mix_to_nix";
   };
 
   mixToNix = src: runCommand "mix.nix" {} ''
-    ${mix2nix}/bin/mix2nix ${src}/mix.lock > $out
+    ${mix-to-nix}/bin/mix_to_nix ${src}/mix.lock > $out
   '';
 in
 
-(import (mixToNix root)) root
+(import (mixToNix root)) root {
+  inherit stdenv elixir fetchurl fetchzip python3Packages rebar rebar3;
+}
