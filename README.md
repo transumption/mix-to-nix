@@ -35,7 +35,7 @@ $ MIX_ARCHIVES=$PWD/.mix/archives \
 
 To build an escript, override `postBuild` and `installPhase`:
 
-```
+```nix
 (mixToNix { src = lib.cleanSource ./.; }).overrideAttrs (super: {
   postBuild = ''
     mix escript.build --no-deps-check
@@ -47,7 +47,7 @@ To build an escript, override `postBuild` and `installPhase`:
 
 ### Distillery
 
-```
+```nix
 (mixToNix { src = lib.cleanSource ./.; }).overrideAttrs (super: {
   buildPhase = ''
     mix release --env=prod
