@@ -61,7 +61,7 @@ To build an escript, override `postBuild` and `installPhase`:
 })
 ```
 
-## Implementation
+## Details
 
 First, [`elixir-to-json`](elixir-to-json) evaluates Elixir term in `mix.lock`
 and marshals it to JSON. Tuples are represented as lists.
