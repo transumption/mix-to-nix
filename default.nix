@@ -1,14 +1,9 @@
-{ stdenv, fetchurl, fetchzip, runCommand, elixir, erlang, glibcLocales
+{ stdenv, fetchurl, fetchzip, runCommand, beam, elixir, erlang, glibcLocales
 , python3Packages, rebar, rebar3 }: { src }:
 
 with stdenv.lib;
 
 let
-  hex = fetchurl {
-    url = "https://repo.hex.pm/installs/1.6.0/hex-0.18.1.ez";
-    sha512 = "9c806664a3341930df4528be38b0da216a31994830c4437246555fe3027c047e073415bcb1b6557a28549e12b0c986142f5e3485825a66033f67302e87520119";
-  };
-
   linkDep = name: src: ''
     cp -rs --no-preserve=mode ${src} deps/${name}
 
@@ -21,7 +16,13 @@ let
     name = "mix-project";
     inherit src;
 
-    nativeBuildInputs = [ elixir erlang rebar rebar3 ];
+    nativeBuildInputs = [
+      beam.packages.erlang.hex
+      elixir
+      erlang
+      rebar
+      rebar3
+    ];
 
     configurePhase = ''
       runHook preConfigure
@@ -45,7 +46,6 @@ let
     buildPhase = ''
       runHook preBuild
 
-      mix archive.install --force ${hex}
       mix deps.compile --force
       mix compile --no-deps-check
 
@@ -56,7 +56,7 @@ let
       runHook preInstall
 
       mkdir $out
-      mv .mix * $out
+      mv .mix * $out || true
 
       runHook postInstall
     '';
