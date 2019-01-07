@@ -4,6 +4,21 @@
 with stdenv.lib;
 
 let
+  mixSourceFilter = name: type:
+    !(type == "directory" && name == "_build") &&
+    !(type == "directory" && name == "deps");
+
+  cleanSrc =
+    if builtins.typeOf src == "path" then
+      builtins.path {
+        name = "source";
+        path = src;
+        filter = name: type:
+          cleanSourceFilter name type &&
+          mixSourceFilter name type;
+      }
+    else src;
+
   inherit (beam.packages.erlang) hex hexRegistrySnapshot;
 
   linkDep = name: src: ''
@@ -151,4 +166,4 @@ let
   lockDeps = mapAttrs (const lockDep);
 in
 
-buildMixProject src (lockDeps (importElixir "${src}/mix.lock"))
+buildMixProject cleanSrc (lockDeps (importElixir "${src}/mix.lock"))

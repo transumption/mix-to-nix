@@ -15,7 +15,7 @@ let
   }) {};
 in
 
-mixToNix { src = lib.cleanSource ./.; }
+mixToNix { src = ./.; }
 ```
 
 Run `nix-build`.
@@ -35,7 +35,7 @@ $ MIX_ENV=prod \
 To build an escript, override `postBuild` and `installPhase`:
 
 ```nix
-(mixToNix { src = lib.cleanSource ./.; }).overrideAttrs (super: {
+(mixToNix { src = ./.; }).overrideAttrs (super: {
   postBuild = ''
     mix escript.build --no-deps-check
   '';
@@ -47,7 +47,7 @@ To build an escript, override `postBuild` and `installPhase`:
 ### Distillery
 
 ```nix
-(mixToNix { src = lib.cleanSource ./.; }).overrideAttrs (super: {
+(mixToNix { src = ./.; }).overrideAttrs (super: {
   buildPhase = ''
     mix release --env=prod
   '';
@@ -62,8 +62,11 @@ To build an escript, override `postBuild` and `installPhase`:
 
 ## Details
 
-First, [`elixir-to-json`](elixir-to-json) evaluates Elixir term in `mix.lock`
-and marshals it to JSON. Tuples are represented as lists.
+If `src` is a path, it is filtered against `lib.cleanSource`, `_build/`, and
+`deps/`.
+
+[`elixir-to-json`](elixir-to-json) evaluates Elixir term in `mix.lock` and
+marshals it to JSON. Tuples are represented as lists.
 
 Then, Nix imports that JSON via `lib.importJSON`. Each `mix.lock` key
 corresponds to a `deps/` path. Two types of deps are supported, `:git` and
@@ -79,9 +82,6 @@ source code archive. Nix can only carry that catenation into the sandbox, so
 archive starts and extracts that part, ignoring archive version and metadata.
 
 ## Quirks
-
-Delete `_build` and `deps` before running `nix-build`. This will be fixed with
-a custom source filter.
 
 If you have dependencies that require Rebar3 plugins (such as `pc` or
 `rebar3_hex`), add them to `mix.exs` deps. These are normally unpinned and
