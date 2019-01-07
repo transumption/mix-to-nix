@@ -4,12 +4,16 @@
 with stdenv.lib;
 
 let
+  inherit (beam.packages.erlang) hex hexRegistrySnapshot;
+
   linkDep = name: src: ''
     cp -rs --no-preserve=mode ${src} deps/${name}
 
-    mkdir deps/${name}/.git
+    mkdir -p deps/${name}/.git
     touch deps/${name}/.git/HEAD
 
+    mkdir -p deps/${name}/_build/default
+    ln -s ../../.. deps/${name}/_build/default/plugins
   '';
 
   buildMixProject = src: deps: stdenv.mkDerivation {
@@ -17,25 +21,29 @@ let
     inherit src;
 
     nativeBuildInputs = [
-      beam.packages.erlang.hex
       elixir
       erlang
+      hex
       rebar
       rebar3
     ];
 
     configurePhase = ''
       runHook preConfigure
+      export HOME=$PWD
 
-      mkdir deps
+      mkdir -p .cache/rebar3/hex/default deps
+
+      ln -s \
+        ${hexRegistrySnapshot}/var/hex/registry.ets \
+        .cache/rebar3/hex/default/registry
+
       ${concatStrings (mapAttrsToList linkDep deps)}
 
       runHook postConfigure
     '';
 
-    HOME = ".";
     LANG = "en_US.UTF-8";
-
     LOCALE_ARCHIVE = optionalString stdenv.isLinux
       "${glibcLocales}/lib/locale/locale-archive";
 
@@ -59,6 +67,16 @@ let
       mv .mix * $out || true
 
       runHook postInstall
+    '';
+
+    doCheck = true;
+
+    checkPhase = ''
+      runHook preCheck
+
+      mix test --no-deps-check
+
+      runHook postCheck
     '';
   };
 
@@ -86,7 +104,8 @@ let
   };
 
   fetchHex = { pname, version, sha256 }: stdenv.mkDerivation {
-    name = "${pname}-${version}-hexpm";
+    inherit pname version;
+    name = "${pname}-${version}";
 
     src = fetchurl {
       name = "${pname}-${version}.mix";
