@@ -11,7 +11,7 @@ with import <nixpkgs> {};
 let
   mixToNix = callPackage (fetchGit {
     url = https://gitlab.com/transumption/mix-to-nix;
-    rev = "46eb30c8d371cad74e551fd05583674de79ad471";
+    rev = "4c9e50944aa7cf11237cc326109580e15a173a14";
   }) {};
 in
 
@@ -26,8 +26,7 @@ To start an OTP app, run:
 
 ```
 $ cd result
-$ MIX_ARCHIVES=$PWD/.mix/archives \
-  MIX_ENV=prod \
+$ MIX_ENV=prod \
   mix run -c /path/to/config.exs --no-halt
 ```
 
@@ -78,3 +77,12 @@ hash of catenation of Mix archive version, package metadata, and `.tar.gz`
 source code archive. Nix can only carry that catenation into the sandbox, so
 [`binwalk`](https://github.com/ReFirmLabs/binwalk) finds where the source code
 archive starts and extracts that part, ignoring archive version and metadata.
+
+## Quirks
+
+Delete `_build` and `deps` before running `nix-build`. This will be fixed with
+a custom source filter.
+
+If you have dependencies that require Rebar3 plugins (such as `pc` or
+`rebar3_hex`), add them to `mix.exs` deps. These are normally unpinned and
+non-sandboxable. See [`tests/02-fast-yaml`](tests/02-fast-yaml) for example.
