@@ -1,0 +1,6 @@
+%{
+  "fast_yaml": {:hex, :fast_yaml, "1.0.17", "e945ef64e0cb7c311c7b42804dbe32a24e13a2afc0ffe249b7e0f9f9ac08e176", [:rebar3], [{:p1_utils, "1.0.13", [hex: :p1_utils, repo: "hexpm", optional: false]}], "hexpm"},
+  "p1_utils": {:hex, :p1_utils, "1.0.13", "176577cafb54a8c2fdc0a7fc62b9a21ab0f66588f4062792cd9e65f3e500bfdb", [:rebar3], [], "hexpm"},
+  "pc": {:hex, :pc, "1.10.0", "5c8306018c7357089f8175e1c238ae502759cf9e302dd95ffefff1f051ac0f39", [:rebar3], [], "hexpm"},
+  "rebar3_hex": {:hex, :rebar3_hex, "6.2.0", "9080977ee3b246e16cbf4334c0dff2c425932b44fa8c01a19522888032b7544c", [:rebar3], [], "hexpm"},
+}
