@@ -40,7 +40,7 @@ To build an escript, override `postBuild` and `installPhase`:
     mix escript.build --no-deps-check
   '';
 
-  installPhase = "install -Dt $out/bin <name-here>";
+  installPhase = "install -Dt $out/bin ${super.pname}";
 });
 ```
 

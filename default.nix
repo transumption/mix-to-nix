@@ -31,8 +31,24 @@ let
     ln -s ../../.. deps/${name}/_build/default/plugins
   '';
 
-  buildMixProject = src: deps: stdenv.mkDerivation {
-    name = "mix-project";
+  readMixConfig = src: key: runCommand "mix-config" {
+    nativeBuildInputs = [ elixir hex ];
+
+    LANG = "en_US.UTF-8";
+    LOCALE_ARCHIVE = optionalString stdenv.isLinux
+      "${glibcLocales}/lib/locale/locale-archive";
+
+    MIX_EXS = "${src}/mix.exs";
+  } ''
+    mix run --no-compile --no-deps-check --no-start \
+      --eval 'IO.write Mix.Project.config[${key}]' > $out
+  '';
+
+  buildMixProject = src: deps: stdenv.mkDerivation rec {
+    pname = readFile (readMixConfig src ":app");
+    version = readFile (readMixConfig src ":version");
+
+    name = "${pname}-${version}";
     inherit src;
 
     nativeBuildInputs = [
@@ -53,7 +69,7 @@ let
         ${hexRegistrySnapshot}/var/hex/registry.ets \
         .cache/rebar3/hex/default/registry
 
-      ${concatStrings (mapAttrsToList linkDep deps)}
+      ${concatStringsSep "\n" (mapAttrsToList linkDep deps)}
 
       runHook postConfigure
     '';
@@ -105,7 +121,7 @@ let
       mix escript.build --no-deps-check
     '';
 
-    installPhase = "install -Dt $out/bin elixir_to_json";
+    installPhase = "install -Dt $out/bin ${super.pname}";
   });
 
   elixirToJSON = path: runCommand "elixir.json" {} ''
