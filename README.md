@@ -11,7 +11,7 @@ with import <nixpkgs> {};
 let
   mixToNix = callPackage (fetchGit {
     url = https://gitlab.com/transumption/mix-to-nix;
-    rev = "412fff2229f612c6fe74a467a4b672a1a08133dd";
+    rev = "9bc4a6ef155f3d47e1ccd570b0d8b13468daeea7";
   }) {};
 in
 
