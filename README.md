@@ -54,7 +54,6 @@ To build an escript, override `postBuild` and `installPhase`:
   
   installPhase = ''
     mkdir $out
-
     find _build -name \*.tar.gz | xargs cat | tar zxf - -C $out
   '';
 })
