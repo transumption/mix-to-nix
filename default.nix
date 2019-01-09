@@ -152,7 +152,7 @@ let
     nativeBuildInputs = [ binwalk ];
 
     unpackPhase = ''
-      HOME=. binwalk --extract $src
+      HOME=. binwalk --include compress --extract $src
     '';
 
     installPhase = ''
