@@ -5,9 +5,10 @@ let
 in
 
 [
-  (mixToNix { src = ../elixir-to-json; }) # 00-bootstrap
-  (mixToNix { src = ./01-poison; })
-  ((mixToNix { src = ./02-fast-yaml; }).overrideAttrs (super: {
+  (mixToNix (_: { src = ../elixir-to-json; })) # 00-bootstrap
+  (mixToNix (_: { src = ./01-poison; }))
+  (mixToNix (_: {
+    src = ./02-fast-yaml;
     buildInputs = [ libyaml ];
   }))
 ]

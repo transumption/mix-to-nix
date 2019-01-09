@@ -15,7 +15,7 @@ let
   }) {};
 in
 
-mixToNix { src = ./.; }
+mixToNix (super: { src = ./.; })
 ```
 
 Run `nix-build`.
@@ -35,19 +35,23 @@ $ MIX_ENV=prod \
 To build an escript, override `postBuild` and `installPhase`:
 
 ```nix
-(mixToNix { src = ./.; }).overrideAttrs (super: {
+mixToNix (super: {
+  src = ./.;
+
   postBuild = ''
     mix escript.build --no-deps-check
   '';
 
   installPhase = "install -Dt $out/bin ${super.pname}";
-});
+})
 ```
 
 ### Distillery
 
 ```nix
-(mixToNix { src = ./.; }).overrideAttrs (super: {
+mixToNix (super: {
+  src = ./.;
+
   buildPhase = ''
     mix release --env=prod
   '';

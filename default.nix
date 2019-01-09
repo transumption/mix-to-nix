@@ -1,23 +1,32 @@
 { stdenv, fetchurl, fetchzip, runCommand, beam, elixir, erlang, glibcLocales
-, python3Packages, rebar, rebar3 }: { src }:
+, python3Packages, rebar, rebar3 }: override:
 
 with stdenv.lib;
 
 let
   mixSourceFilter = name: type:
-    !(type == "directory" && name == "_build") &&
-    !(type == "directory" && name == "deps");
+    let
+      baseName = baseNameOf name;
+    in
+    !(type == "directory" && (baseName == "_build" || baseName == "deps"));
+
+  originalSrc = (override {
+    passthru = { inherit mixSourceFilter; };
+  }).src;
+
+  overrideAttrsExcept = attrs: drv: override:
+    drv.overrideAttrs (_: removeAttrs (override drv) attrs);
 
   cleanSrc =
-    if builtins.typeOf src == "path" then
+    if (builtins.typeOf originalSrc) == "path" then
       builtins.path {
         name = "source";
-        path = src;
+        path = originalSrc;
         filter = name: type:
           cleanSourceFilter name type &&
           mixSourceFilter name type;
       }
-    else src;
+    else originalSrc;
 
   inherit (beam.packages.erlang) hex hexRegistrySnapshot;
 
@@ -149,6 +158,8 @@ let
       '';
     };
 
+    passthru = { inherit mixSourceFilter; };
+
     nativeBuildInputs = [ binwalk ];
 
     unpackPhase = ''
@@ -180,6 +191,10 @@ let
     else nil;
 
   lockDeps = mapAttrs (const lockDep);
+
+  lockClosure = lockDeps (importElixir "${cleanSrc}/mix.lock");
+
+  mixProject = buildMixProject cleanSrc lockClosure;
 in
 
-buildMixProject cleanSrc (lockDeps (importElixir "${src}/mix.lock"))
+overrideAttrsExcept [ "src" ] mixProject override
