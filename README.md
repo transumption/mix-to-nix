@@ -9,13 +9,13 @@ To try it out, create the following `default.nix` in your Mix project:
 with import <nixpkgs> {};
 
 let
-  mixToNix = callPackage (fetchGit {
+  inherit (callPackage (fetchGit {
     url = https://gitlab.com/transumption/mix-to-nix;
     rev = "9bc4a6ef155f3d47e1ccd570b0d8b13468daeea7";
-  }) {};
+  }) {}) mixToNix;
 in
 
-mixToNix (super: { src = ./.; })
+mixToNix { src = ./.; }
 ```
 
 Run `nix-build`.
@@ -27,7 +27,7 @@ To start an OTP app, run:
 ```
 $ cd result
 $ MIX_ENV=prod \
-  mix run -c /path/to/config.exs --no-halt
+  mix run -c /path/to/config.exs --no-deps-check --no-halt
 ```
 
 ### Escripts
@@ -35,9 +35,7 @@ $ MIX_ENV=prod \
 To build an escript, override `postBuild` and `installPhase`:
 
 ```nix
-mixToNix (super: {
-  src = ./.;
-
+(mixToNix { src = ./.; }).overrideAttrs (super: {
   postBuild = ''
     mix escript.build --no-deps-check
   '';
@@ -49,9 +47,7 @@ mixToNix (super: {
 ### Distillery
 
 ```nix
-mixToNix (super: {
-  src = ./.;
-
+(mixToNix { src = ./.; }).overrideAttrs (super: {
   buildPhase = ''
     mix release --env=prod
   '';
@@ -84,8 +80,23 @@ source code archive. Nix can only carry that catenation into the sandbox, so
 [`binwalk`](https://github.com/ReFirmLabs/binwalk) finds where the source code
 archive starts and extracts that part, ignoring archive version and metadata.
 
+`:git` only supports Mix projects, while `:hexpm` supports both Mix and Rebar3
+projects.
+
+[`fake-hex-registry`](fake-hex-registry) creates a fake [Hex v1
+registry](https://git.io/fhZuz) with dependencies for Rebar3 projects. [Rebar3
+needs registry to function](https://github.com/erlang/rebar3/issues/1267).
+
+Every dependency is built and cached individually via Nixpkgs `buildMix`
+and `buildRebar3`.
+
 ## Quirks
+
+`:git` dependencies are flat, so they are assumed to depend on every other
+entry in `mix.lock`. If this is undesirable, you can override `beamDeps`
+via `overlay`.
 
 If you have dependencies that require Rebar3 plugins (such as `pc` or
 `rebar3_hex`), add them to `mix.exs` deps. These are normally unpinned and
-non-sandboxable. See [`tests/02-fast-yaml`](tests/02-fast-yaml) for example.
+non-sandboxable. You will also need to set `buildPlugins` via `overlay`. See
+[`tests/02-fast-yaml`](tests/default.nix#L19) for example.

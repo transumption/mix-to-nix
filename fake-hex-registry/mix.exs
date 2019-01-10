@@ -1,10 +1,10 @@
-defmodule ElixirToJSON.MixProject do
+defmodule FakeHexRegistry.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :elixir_to_json,
-      escript: [main_module: ElixirToJSON],
+      app: :fake_hex_registry,
+      escript: [main_module: FakeHexRegistry],
       version: "0.0.0",
       deps: [
         jason: "1.1.2"
