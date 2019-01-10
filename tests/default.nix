@@ -29,4 +29,6 @@ in
        };
      };
   };
+
+  _03-cowboy = mixToNix { src = ./03-cowboy; };
 }

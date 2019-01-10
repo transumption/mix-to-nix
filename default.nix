@@ -1,5 +1,5 @@
 { stdenv, fetchurl, fetchzip, runCommand, beamPackages, glibcLocales
-, python3Packages, writeText }:
+, python3Packages, writeShellScriptBin, writeText }:
 
 with stdenv.lib;
 
@@ -97,24 +97,35 @@ let
 
   beamDeps = drv: (drv.beamDeps or []) ++ (drv.buildPlugins or []);
 
-  fakeHexPackage = drv: {
+  fakeHexPackage = drv: [{
     name = drv.pname;
     inherit (drv) version;
 
-    sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"; # SHA-256("")
+    sha256 = "0000000000000000000000000000000000000000000000000000000000000000";
 
     deps = map (dep: { name = dep.pname; inherit (dep) version; }) (beamDeps drv);
     tools = drv.buildTools;
-  };
+  }] ++ concatMap fakeHexPackage (beamDeps drv);
 
   isRebar3 = drv: drv.buildTools == [ "rebar3" ];
 
+  fakeGit = writeShellScriptBin "git" ''
+    echo 0000000000000000000000000000000000000000
+  '';
+
   fakeHexOverrideImpl = prev: next:
-    if isRebar3 prev then prev.override {
-      preConfigure = (prev.preConfigure or "") + ''
-        export HEX_REGISTRY_SNAPSHOT=${fakeHexRegistry (map fakeHexPackage (beamDeps next))}
-      '';
-    } else prev;
+    if isRebar3 prev then
+      let
+        registry = fakeHexRegistry (unique (concatMap fakeHexPackage (beamDeps next)));
+      in
+      prev.override {
+        nativeBuildInputs = (prev.nativeBuildInputs or []) ++ [ fakeGit ];
+
+        preConfigure = (prev.preConfigure or "") + ''
+          export HEX_REGISTRY_SNAPSHOT=${registry}
+        '';
+      }
+    else prev;
 
   fakeHexOverride = final: name: prev:
     fakeHexOverrideImpl prev (getAttr name final);
@@ -153,24 +164,26 @@ let
     '';
   };
 
-  lockSubDeps = self:
-    map (subdep: getAttr (head subdep) self);
+  lockSubDeps = self: subdeps:
+    remove null (map (subdep: self."${head subdep}" or null) subdeps);
 
   lockDep = self: pname: dep:
     let
-      kind = head dep;
+      scm = head dep;
     in
-    if kind == "hex" then
+    if scm == "hex" then
       let
-        buildTool = head (elemAt dep 4);
+        buildTools = elemAt dep 4;
         buildPackage =
-          if buildTool == "mix" then buildMix
-          else if buildTool == "rebar3" then buildRebar3
+          if elem "rebar3" buildTools then buildRebar3
+          else if elem "rebar" buildTools then buildRebar3
+          else if elem "mix" buildTools then buildMix
           else throw "unsupported build tool: ${buildTool}";
       in
       buildPackage rec {
         inherit (src) pname version;
         name = src.pname;
+        inherit scm;
 
         src = fetchHex {
           pname = elemAt dep 1;
@@ -180,17 +193,18 @@ let
 
         beamDeps = lockSubDeps self (elemAt dep 5);
       }
-    else if kind == "git" then
+    else if scm == "git" then
       buildMix rec {
         name = pname;
         version = src.rev;
+        inherit scm;
 
         src = fetchGit {
           url = elemAt dep 1;
           rev = elemAt dep 2;
         };
 
-        beamDeps = attrValues (removeAttrs self [ pname ]);
+        beamDeps = filter (drv: drv.scm != "git") (attrValues self);
       }
     else throw "unsupported dep type: ${kind}";
 

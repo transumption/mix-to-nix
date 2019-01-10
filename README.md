@@ -92,9 +92,9 @@ and `buildRebar3`.
 
 ## Quirks
 
-`:git` dependencies are flat, so they are assumed to depend on every other
-entry in `mix.lock`. If this is undesirable, you can override `beamDeps`
-via `overlay`.
+`:git` dependencies are flat, so they are assumed to depend on every non-Git
+entry in `mix.lock`. If this is undesirable, or if you want to make Git deps
+depend on each other, you can override `beamDeps` via `overlay`.
 
 If you have dependencies that require Rebar3 plugins (such as `pc` or
 `rebar3_hex`), add them to `mix.exs` deps. These are normally unpinned and
