@@ -178,7 +178,7 @@ let
           if elem "rebar3" buildTools then buildRebar3
           else if elem "rebar" buildTools then buildRebar3
           else if elem "mix" buildTools then buildMix
-          else throw "unsupported build tool: ${buildTool}";
+          else throw "unsupported build tools: ${concatStringsSep ", " buildTools}";
       in
       buildPackage rec {
         inherit (src) pname version;
@@ -206,7 +206,7 @@ let
 
         beamDeps = filter (drv: drv.scm != "git") (attrValues self);
       }
-    else throw "unsupported dep type: ${kind}";
+    else throw "unsupported SCM: ${scm}";
 
   elixirToJSON = path:
     runCommand "elixir-term.json" { inherit LANG LOCALE_ARCHIVE; } ''
