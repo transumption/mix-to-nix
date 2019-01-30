@@ -278,8 +278,9 @@ in
       installPhase = ''
         runHook preInstall
 
-        mkdir $out
-        mv * $out
+        cp -r $PWD $out
+        cd $out
+        ln -s _build/prod/lib deps
 
         runHook postInstall
       '';
