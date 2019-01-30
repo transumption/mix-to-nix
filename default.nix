@@ -27,6 +27,10 @@ let
   LOCALE_ARCHIVE = optionalString stdenv.isLinux
     "${glibcLocales}/lib/locale/locale-archive";
 
+  buildErlangMk = drv: makeOverridable beamPackages.buildErlangMk ({
+    buildTools = [ "make" ];
+  } // drv);
+
   buildMix = drv: makeOverridable beamPackages.buildMix ({
     buildTools = [ "mix" ];
 
@@ -178,6 +182,7 @@ let
           if elem "rebar3" buildTools then buildRebar3
           else if elem "rebar" buildTools then buildRebar3
           else if elem "mix" buildTools then buildMix
+          else if elem "make" buildTools then buildErlangMk
           else throw "unsupported build tools: ${concatStringsSep ", " buildTools}";
       in
       buildPackage rec {
