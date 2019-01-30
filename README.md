@@ -80,8 +80,7 @@ source code archive. Nix can only carry that catenation into the sandbox, so
 [`binwalk`](https://github.com/ReFirmLabs/binwalk) finds where the source code
 archive starts and extracts that part, ignoring archive version and metadata.
 
-`:git` only supports Mix projects, while `:hexpm` supports both Mix and Rebar3
-projects.
+Mix, Rebar3 and ErlangMk deps are supported.
 
 [`fake-hex-registry`](fake-hex-registry) creates a fake [Hex v1
 registry](https://git.io/fhZuz) with dependencies for Rebar3 projects. [Rebar3

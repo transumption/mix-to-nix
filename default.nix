@@ -10,7 +10,7 @@ let
     in
     !(type == "directory" && (baseName == "_build" || baseName == "deps"));
 
-  inherit (builtins) path toJSON typeOf;
+  inherit (builtins) path pathExists readFile toJSON typeOf;
 
   cleanSrc = src:
     if typeOf src == "path" then
@@ -199,15 +199,26 @@ let
         beamDeps = lockSubDeps self (elemAt dep 5);
       }
     else if scm == "git" then
-      buildMix rec {
-        name = pname;
-        version = src.rev;
-        inherit scm;
-
+      let
         src = fetchGit {
           url = elemAt dep 1;
           rev = elemAt dep 2;
         };
+
+        stripContext = text: readFile (runCommand "string-without-context" {} ''
+          echo -n "${text}" > $out
+        '');
+
+        buildPackage =
+          if pathExists "${stripContext src}/mix.lock" then buildMix
+          else if pathExists "${stripContext src}/rebar.lock" then buildRebar3
+          else if pathExists "${stripContext src}/erlang.mk" then buildErlangMk
+          else throw "can't identify git dep build system: ${src}";
+      in
+      buildPackage {
+        name = pname;
+        version = src.rev;
+        inherit scm src;
 
         beamDeps = filter (drv: drv.scm != "git") (attrValues self);
       }
