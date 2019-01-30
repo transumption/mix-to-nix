@@ -28,6 +28,7 @@ let
     "${glibcLocales}/lib/locale/locale-archive";
 
   buildErlangMk = drv: makeOverridable beamPackages.buildErlangMk ({
+    nativeBuildInputs = [ fakeGit ];
     prePatch = ''
       substituteInPlace Makefile \
         --replace /bin/bash ${stdenv.shell}
@@ -37,6 +38,7 @@ let
   } // drv);
 
   buildMix = drv: makeOverridable beamPackages.buildMix ({
+    nativeBuildInputs = [ fakeGit ];
     buildTools = [ "mix" ];
 
     checkPhase = ''
@@ -51,6 +53,7 @@ let
   } // drv);
 
   buildRebar3 = drv: makeOverridable beamPackages.buildRebar3 ({
+    nativeBuildInputs = [ fakeGit ];
     buildTools = [ "rebar3" ];
   } // drv);
 
