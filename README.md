@@ -49,7 +49,7 @@ To build an escript, override `postBuild` and `installPhase`:
 ```nix
 (mixToNix { src = ./.; }).overrideAttrs (super: {
   buildPhase = ''
-    mix do compile --no-deps-check, release --env=prod
+    mix do deps.loadpaths --no-deps-check, release --env=prod
   '';
   
   installPhase = ''

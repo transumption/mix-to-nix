@@ -44,7 +44,7 @@ let
     checkPhase = ''
       runHook preCheck
 
-      mix test --no-deps-check
+      mix do deps.loadpaths --no-deps-check, test
 
       runHook postCheck
     '';
