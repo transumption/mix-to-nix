@@ -28,6 +28,11 @@ let
     "${glibcLocales}/lib/locale/locale-archive";
 
   buildErlangMk = drv: makeOverridable beamPackages.buildErlangMk ({
+    prePatch = ''
+      substituteInPlace Makefile \
+        --replace /bin/bash ${stdenv.shell}
+    '';
+
     buildTools = [ "make" ];
   } // drv);
 
