@@ -221,7 +221,7 @@ let
   importElixir = path: importJSON (elixirToJSON path);
 
   evalMixConfig = src: runCommand "mix-config.exs" {
-    nativeBuildInputs = [ elixir hex ];
+    nativeBuildInputs = [ elixir fakeGit hex ];
 
     inherit LANG LOCALE_ARCHIVE;
     MIX_EXS = "${src}/mix.exs";
