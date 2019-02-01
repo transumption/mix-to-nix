@@ -29,12 +29,14 @@ let
 
   buildErlangMk = drv: makeOverridable beamPackages.buildErlangMk ({
     nativeBuildInputs = [ fakeGit ];
+    buildTools = [ "make" ];
+
     prePatch = ''
       substituteInPlace Makefile \
         --replace /bin/bash ${stdenv.shell}
     '';
 
-    buildTools = [ "make" ];
+    inherit LANG LOCALE_ARCHIVE;
   } // drv);
 
   buildMix = drv: makeOverridable beamPackages.buildMix ({
@@ -55,6 +57,8 @@ let
   buildRebar3 = drv: makeOverridable beamPackages.buildRebar3 ({
     nativeBuildInputs = [ fakeGit ];
     buildTools = [ "rebar3" ];
+
+    inherit LANG LOCALE_ARCHIVE;
   } // drv);
 
   jason = buildMix rec {
