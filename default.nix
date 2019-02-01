@@ -135,8 +135,6 @@ let
         registry = fakeHexRegistry (unique (concatMap fakeHexPackage (beamDeps next)));
       in
       prev.override {
-        nativeBuildInputs = (prev.nativeBuildInputs or []) ++ [ fakeGit ];
-
         preConfigure = (prev.preConfigure or "") + ''
           export HEX_REGISTRY_SNAPSHOT=${registry}
         '';
