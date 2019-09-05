@@ -270,7 +270,7 @@ in
         // (composeExtensions overlay registryOverlay) finalClosure superClosure;
     in
     buildMix {
-      name = mixConfig.app;
+      name = mixConfig.app or "mix-project";
       version = mixConfig.version;
 
       src = cleanedSrc;
